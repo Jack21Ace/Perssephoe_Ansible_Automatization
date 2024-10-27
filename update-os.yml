@@ -1,12 +1,8 @@
 ---
 - name: Update Operating System
-  hosts: localhost
+  hosts: host_machine  # Cambiado de localhost a host_machine
   become: true
-  connection: local
   gather_facts: no  # Desactiva la recolección de facts del sistema
-
-  vars:
-    ansible_become_pass: "{{ lookup('env', 'PASSWORD_ROOT') }}"  # Usa PASSWORD_ROOT del entorno de Semaphore
 
   tasks:
     # Actualizar la lista de paquetes
