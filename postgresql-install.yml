@@ -1,15 +1,16 @@
 ---
 - name: Configure PostgreSQL superuser and create admin user
-  hosts: localhost
+  hosts: localhost  # Cambia a localhost para ejecución local, evita SSH
   become: true
+  connection: local  # Conexión directa sin SSH en el host local
 
-# Esto pedira que se pasen las credenciales por linea de comandos para el superusuario
+# Esto pedirá que se pasen las credenciales por línea de comandos para el superusuario
   vars_prompt:
     - name: "postgres_admin_password"
       prompt: "Please enter the password for the PostgreSQL superuser (postgres)"
       private: yes
 
-# Esto pedira que se pasen las credenciales por linea de comandos para el usuario administrador
+# Esto pedirá que se pasen las credenciales por línea de comandos para el usuario administrador
     - name: "admin_user_password"
       prompt: "Please enter the password for the admin user"
       private: yes
@@ -18,7 +19,7 @@
   vars:
     admin_user: "admin"
 
-# Instalación de postgreSQL
+# Instalación de PostgreSQL
   tasks:
   - name: Install PostgreSQL packages
     apt:
@@ -26,7 +27,7 @@
       state: present
     tags: install
 
-# Verificación de los servicios habilitados
+# Verificación de que el servicio PostgreSQL está habilitado y en ejecución
   - name: Ensure PostgreSQL service is started and enabled
     service:
       name: postgresql
@@ -34,29 +35,29 @@
       enabled: yes
     tags: service
 
-# Asignación de la contaseña al super usuarios
+# Asignación de la contraseña al superusuario postgres
   - name: Set PostgreSQL superuser password
     become_user: postgres
-    postgresql_user:
+    community.postgresql.postgresql_user:
       name: postgres
       password: "{{ postgres_admin_password }}"
       state: present
     tags: config
 
-# Aqui se crea un usuario administrador para las tareas cotidianas
+# Aquí se crea un usuario administrador para tareas cotidianas (sin permisos de superusuario)
   - name: Create administrator user for routine tasks (non-superuser)
     become_user: postgres
-    postgresql_user:
+    community.postgresql.postgresql_user:
       name: "{{ admin_user }}"
       password: "{{ admin_user_password }}"
       role_attr_flags: CREATEDB,NOSUPERUSER
       state: present
     tags: users
 
-# Asignacion de permisos para el usuario administrador no-root
+# Asignación de permisos para el usuario administrador no-root en el esquema public
   - name: Grant all privileges on schema public to administrator user
     become_user: postgres
-    postgresql_privs:
+    community.postgresql.postgresql_privs:
       db: "postgres"  # Actualmente solo se tiene la base de datos postgres
       roles: "{{ admin_user }}"
       objs: public
@@ -64,9 +65,10 @@
       privs: "ALL"
     tags: users
 
+# Asignación de permisos sobre todas las tablas en el esquema public para el usuario administrador
   - name: Grant all privileges on tables in schema public to administrator user
     become_user: postgres
-    postgresql_privs:
+    community.postgresql.postgresql_privs:
       db: "postgres"
       roles: "{{ admin_user }}"
       objs: ALL_IN_SCHEMA
