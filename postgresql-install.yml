@@ -1,6 +1,6 @@
 ---
 - name: Configure PostgreSQL superuser and create admin user
-  hosts: [192.168.1.106]
+  hosts: localhost
   become: true
 
 # Esto pedira que se pasen las credenciales por linea de comandos para el superusuario
