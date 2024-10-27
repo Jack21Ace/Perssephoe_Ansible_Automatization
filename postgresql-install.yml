@@ -1,0 +1,76 @@
+---
+- name: Configure PostgreSQL superuser and create admin user
+  hosts: [192.168.1.106]
+  become: true
+
+# Esto pedira que se pasen las credenciales por linea de comandos para el superusuario
+  vars_prompt:
+    - name: "postgres_admin_password"
+      prompt: "Please enter the password for the PostgreSQL superuser (postgres)"
+      private: yes
+
+# Esto pedira que se pasen las credenciales por linea de comandos para el usuario administrador
+    - name: "admin_user_password"
+      prompt: "Please enter the password for the admin user"
+      private: yes
+
+# Creación de usuario administrador no-root
+  vars:
+    admin_user: "admin"
+
+# Instalación de postgreSQL
+  tasks:
+  - name: Install PostgreSQL packages
+    apt:
+      name: postgresql
+      state: present
+    tags: install
+
+# Verificación de los servicios habilitados
+  - name: Ensure PostgreSQL service is started and enabled
+    service:
+      name: postgresql
+      state: started
+      enabled: yes
+    tags: service
+
+# Asignación de la contaseña al super usuarios
+  - name: Set PostgreSQL superuser password
+    become_user: postgres
+    postgresql_user:
+      name: postgres
+      password: "{{ postgres_admin_password }}"
+      state: present
+    tags: config
+
+# Aqui se crea un usuario administrador para las tareas cotidianas
+  - name: Create administrator user for routine tasks (non-superuser)
+    become_user: postgres
+    postgresql_user:
+      name: "{{ admin_user }}"
+      password: "{{ admin_user_password }}"
+      role_attr_flags: CREATEDB,NOSUPERUSER
+      state: present
+    tags: users
+
+# Asignacion de permisos para el usuario administrador no-root
+  - name: Grant all privileges on schema public to administrator user
+    become_user: postgres
+    postgresql_privs:
+      db: "postgres"  # Actualmente solo se tiene la base de datos postgres
+      roles: "{{ admin_user }}"
+      objs: public
+      type: schema
+      privs: "ALL"
+    tags: users
+
+  - name: Grant all privileges on tables in schema public to administrator user
+    become_user: postgres
+    postgresql_privs:
+      db: "postgres"
+      roles: "{{ admin_user }}"
+      objs: ALL_IN_SCHEMA
+      schema: public
+      type: table
+      privs: "ALL"
+    tags: users
