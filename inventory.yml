@@ -6,4 +6,5 @@ all:
 
     WebServerA1:
       ansible_host: 192.168.1.11
-      ansible_connection: ssh
+      ansible_user: nginx       # Reemplaza con el usuario que configuraste en SSH
+#      ansible_ssh_private_key_file: ~/.ssh/id_rsa  # Ruta a la clave privada en la máquina host
