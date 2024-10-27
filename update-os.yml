@@ -1,0 +1,21 @@
+---
+- name: Update Operating System
+  hosts: localhost
+  become: true
+  connection: local
+
+  vars:
+    ansible_become_pass: "{{ lookup('env', 'PASSWORD_ROOT') }}"  # Usa PASSWORD_ROOT del entorno de Semaphore
+
+  tasks:
+    # Actualizar la lista de paquetes
+    - name: Update package list
+      apt:
+        update_cache: yes
+      tags: update
+
+    # Actualizar todos los paquetes instalados
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+      tags: upgrade
