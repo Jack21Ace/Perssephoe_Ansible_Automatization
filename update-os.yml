@@ -2,15 +2,25 @@
 - name: Update Operating System
   hosts: localhost
   become: true
-  gather_facts: no
+  gather_facts: yes
 
   tasks:
     - name: Update package list
       apt:
         update_cache: yes
+        force_apt_get: yes  # Forzar el uso de apt-get
       tags: update
 
-    - name: Upgrade all packages
+    - name: Upgrade all packages to the latest version
       apt:
         upgrade: dist
+        update_cache: yes  # Asegura que la caché esté actualizada antes de la actualización
+        force_apt_get: yes  # Forzar el uso de apt-get
+      tags: upgrade
+
+    - name: Ensure all packages are installed and up-to-date
+      apt:
+        name: "*"
+        state: latest  # Asegura que todos los paquetes estén en su última versión
+        force_apt_get: yes  # Forzar el uso de apt-get
       tags: upgrade
