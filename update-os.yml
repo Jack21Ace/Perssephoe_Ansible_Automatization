@@ -1,6 +1,6 @@
 ---
 - name: Update Operating System
-  hosts: host_machine
+  hosts: localhost
   become: true
   gather_facts: no
 
