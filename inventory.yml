@@ -1,7 +1,6 @@
 ---
 all:
   hosts:
-    localhost:  # Definición del host local
-      ansible_connection: local  # Conexión local
-
-
+    localhost:
+      ansible_connection: local
+      ansible_python_interpreter: /root/snap/semaphore/common/ansible_env/bin/python3
