@@ -1,13 +1,12 @@
 ---
-- name: Playbook para instalar y configurar Nginx en webservera1
+- name: Playbook para instalar y configurar Nginx en WebServerA1
   hosts: WebServerA1
   become: true
   tasks:
 
-    - name: Actualizar lista de paquetes
+    - name: Actualizar la lista de paquetes
       apt:
         update_cache: yes
-        cache_valid_time: 3600
 
     - name: Actualizar todos los paquetes instalados
       apt:
@@ -21,25 +20,6 @@
 
     - name: Habilitar y asegurar que Nginx está en ejecución
       systemd:
-        name: nginx
+        name: nginx.service
         enabled: true
         state: started
-
-    - name: Permitir tráfico HTTP en el firewall
-      ufw:
-        rule: allow
-        name: 'Nginx HTTP'
-
-    - name: Permitir tráfico HTTPS en el firewall (opcional, si necesitas HTTPS)
-      ufw:
-        rule: allow
-        name: 'Nginx HTTPS'
-
-    - name: Verificar que Nginx está activo
-      command: systemctl status nginx
-      register: nginx_status
-      ignore_errors: yes
-
-    - name: Mostrar el estado de Nginx
-      debug:
-        var: nginx_status.stdout_lines
