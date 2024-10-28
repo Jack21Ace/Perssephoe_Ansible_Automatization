@@ -1,6 +1,6 @@
 ---
 - name: Playbook para instalar y configurar Nginx en webservera1
-  hosts: webservera1
+  hosts: WebServerA1
   become: true
   tasks:
 
