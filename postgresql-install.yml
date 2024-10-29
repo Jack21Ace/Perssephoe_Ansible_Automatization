@@ -2,7 +2,7 @@
 - name: Configure PostgreSQL superuser and create admin user
   hosts: grafana  # Cambia a localhost para ejecución local, evita SSH
   become: true
-  connection: local  # Conexión directa sin SSH en el host local
+#  connection: local  # Conexión directa sin SSH en el host local
 
 # Esto pedirá que se pasen las credenciales por línea de comandos para el superusuario
   vars_prompt:
