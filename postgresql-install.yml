@@ -1,6 +1,6 @@
 ---
 - name: Configure PostgreSQL superuser and create admin user
-  hosts: localhost  # Cambia a localhost para ejecución local, evita SSH
+  hosts: grafana  # Cambia a localhost para ejecución local, evita SSH
   become: true
   connection: local  # Conexión directa sin SSH en el host local
 
