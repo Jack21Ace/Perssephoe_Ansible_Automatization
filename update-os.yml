@@ -24,4 +24,3 @@
         state: latest  # Asegura que todos los paquetes estén en su última versión
         force_apt_get: yes  # Forzar el uso de apt-get
       tags: upgrade
-#Jairo Garcia
