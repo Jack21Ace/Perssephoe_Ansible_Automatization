@@ -1,2 +1,5 @@
 # Semaphore_Ansible_Automatization
 Taller Final de Seguridad en infraestructura
+
+Jack21Ace
+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
