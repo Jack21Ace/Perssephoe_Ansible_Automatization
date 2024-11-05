@@ -1,26 +1,22 @@
 ---
-- name: Update Operating System
-  hosts: all
+- name: Actualizar sistemas Ubuntu
+  hosts: "{{ target | default('all') }}"  # Por defecto, actualiza todos los hosts a menos que se especifique un objetivo
   become: true
   gather_facts: yes
 
   tasks:
-    - name: Update package list
+    - name: Actualizar caché de paquetes
       apt:
         update_cache: yes
-        force_apt_get: yes  # Forzar el uso de apt-get
-      tags: update
+      tags: update_cache
 
-    - name: Upgrade all packages to the latest version
+    - name: Actualizar todos los paquetes instalados
       apt:
         upgrade: dist
-        update_cache: yes  # Asegura que la caché esté actualizada antes de la actualización
-        force_apt_get: yes  # Forzar el uso de apt-get
-      tags: upgrade
+      tags: upgrade_all
 
-    - name: Ensure all packages are installed and up-to-date
+    - name: Limpiar paquetes obsoletos
       apt:
-        name: "*"
-        state: latest  # Asegura que todos los paquetes estén en su última versión
-        force_apt_get: yes  # Forzar el uso de apt-get
-      tags: upgrade
+        autoremove: yes
+        purge: yes
+      tags: cleanup
