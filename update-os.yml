@@ -1,11 +1,21 @@
----  
-- hosts: all
-  vars:
-    ansible_host_key_checking: false
-  become: true
-
+---
+- name: Actualizar servidores Ubuntu
+  hosts: all
+  become: yes
   tasks:
-    - name: Update and upgrade apt packages
+    - name: Actualizar lista de paquetes
       apt:
         update_cache: yes
-        upgrade: yes
+        cache_valid_time: 86400  # 1 día en segundos
+
+    - name: Actualizar paquetes instalados
+      apt:
+        name: "*"
+        state: latest
+        update_cache: yes
+        cache_valid_time: 86400
+
+    - name: Eliminar paquetes no utilizados
+      apt:
+        autoremove: yes
+        autoclean: yes
