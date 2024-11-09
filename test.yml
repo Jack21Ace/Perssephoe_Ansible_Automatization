@@ -1,0 +1,9 @@
+# test.yml
+---
+- name: Probar conexión y ejecutar comandos básicos
+  hosts: all
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: Comprobar conexión SSH con un simple comando
+      command: echo "Conexión exitosa"
