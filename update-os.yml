@@ -2,6 +2,7 @@
 - name: Actualizar servidores Ubuntu
   hosts: all
   become: yes
+  gather_facts: no
   tasks:
     - name: Actualizar lista de paquetes
       apt:
@@ -10,10 +11,7 @@
 
     - name: Actualizar paquetes instalados
       apt:
-        name: "*"
-        state: latest
-        update_cache: yes
-        cache_valid_time: 86400
+        upgrade: dist
 
     - name: Eliminar paquetes no utilizados
       apt:
