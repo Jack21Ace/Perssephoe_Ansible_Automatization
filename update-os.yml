@@ -7,11 +7,13 @@
     - name: Actualizar lista de paquetes
       apt:
         update_cache: yes
-        cache_valid_time: 86400  # 1 día en segundos
+        cache_valid_time: 86400
+        timeout: 600
 
     - name: Actualizar paquetes instalados
       apt:
         upgrade: dist
+        timeout: 600
 
     - name: Eliminar paquetes no utilizados
       apt:
