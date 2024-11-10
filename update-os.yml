@@ -27,7 +27,7 @@
     - name: Verificar si el reinicio es necesario
       ansible.builtin.shell: |
         if [ -f /var/run/reboot -required ]; then exit 0; else exit 1; fi
-      register: reboot_required.rc == 0
+      register: reboot_required
 
     - name: Reiniciar servidor despues de actualizar el kernel
       ansible.builtin.reboot:
