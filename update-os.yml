@@ -4,13 +4,22 @@
   become: yes
   gather_facts: no
   tasks:
-    - name: Verificar usuario actual
-      command: whoami
-      register: result
-    - debug:
-        var: result.stdout
-
+    - name: configurar el intérpreter de python
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+  
     - name: Actualizar lista de paquetes
-      apt:
-        update_cache: yes
-        cache_valid_time: 86400
+      #apt:
+      shell: apt-get update
+        #update_cache: yes
+        #cache_valid_time: 86400
+    - name: Actualizar paquetes instalados
+      #apt:
+      shell: apt-get dist-upgrade -y
+        #upgrade: dist
+
+    - name: Eliminar paquetes no utilizados
+      #apt:
+      shell: apt-get autoremove Y && apt-get autoclean -y
+        #autoremove: yes
+        #autoclean: yes
