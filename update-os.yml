@@ -1,36 +1,68 @@
 ---
-- name: Actualizar servidores Ubuntu
+- name: Actualizar servidores Linux
   hosts: all
   become: yes
-  gather_facts: no
+  gather_facts: yes
   tasks:
-    - name: configurar el intérpreter de python
+  
+    - name: Configurar el intérprete de Python
       ansible.builtin.set_fact:
         ansible_python_interpreter: /usr/bin/python3
-  
-    - name: Actualizar lista de paquetes
+
+    - name: Actualizar lista de paquetes en Debian/Ubuntu
       apt:
-      #shell: apt-get update
         update_cache: yes
         cache_valid_time: 86400
-    - name: Actualizar paquetes instalados
-      apt:
-      #shell: apt-get dist-upgrade -y
-        upgrade: dist
+      when: ansible_facts['os_family'] == "Debian"
 
-    - name: Eliminar paquetes no utilizados
+    - name: Actualizar lista de paquetes en Rocky Linux (RHEL)
+      yum:
+        update_cache: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Actualizar paquetes instalados en Debian/Ubuntu
       apt:
-      #shell: apt-get autoremove Y && apt-get autoclean -y
+        upgrade: dist
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Actualizar paquetes instalados en Rocky Linux (RHEL)
+      yum:
+        name: "*"
+        state: latest
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Eliminar paquetes no utilizados en Debian/Ubuntu
+      apt:
         autoremove: yes
         autoclean: yes
+      when: ansible_facts['os_family'] == "Debian"
 
-    - name: Verificar si el reinicio es necesario
-      ansible.builtin.shell: |
-        if [ -f /var/run/reboot -required ]; then exit 0; else exit 1; fi
+    - name: Limpiar caché de paquetes en Rocky Linux (RHEL)
+      yum:
+        name: "*"
+        state: absent
+      when: ansible_facts['os_family'] == "RedHat"
+
+    # Verificar si el reinicio es necesario (Debian/Ubuntu)
+    - name: Check if reboot is required on Debian/Ubuntu
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
       register: reboot_required
+      when: ansible_facts['os_family'] == "Debian"
 
-    - name: Reiniciar servidor despues de actualizar el kernel
+    # Verificar si el reinicio es necesario (Rocky Linux)
+    - name: Check if reboot is required on Rocky Linux
+      command: needs-restarting -r
+      register: reboot_needed
+      ignore_errors: yes
+      when: ansible_facts['os_family'] == "RedHat"
+
+    # Reiniciar el sistema si es necesario en Debian/Ubuntu
+    - name: Reboot the server if required (Debian/Ubuntu)
       ansible.builtin.reboot:
-        reboot_timeout: 300
-      when: reboot_required.changed
-  
+      when: reboot_required.stat.exists and ansible_facts['os_family'] == "Debian"
+
+    # Reiniciar el sistema si es necesario en Rocky Linux
+    - name: Reboot the server if required (Rocky Linux)
+      ansible.builtin.reboot:
+      when: reboot_needed.rc == 1 and ansible_facts['os_family'] == "RedHat"
