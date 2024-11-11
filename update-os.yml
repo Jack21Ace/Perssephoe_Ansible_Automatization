@@ -40,7 +40,7 @@
     - name: Limpiar caché de paquetes en Rocky Linux (RHEL)
       yum:
         name: "*"
-        state: absent
+        state: autoremove
       when: ansible_facts['os_family'] == "RedHat"
 
     # Obtener la versión del kernel en ejecución
