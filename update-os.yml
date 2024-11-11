@@ -4,7 +4,7 @@
   become: yes
   gather_facts: yes
   tasks:
-  
+
     - name: Configurar el intérprete de Python
       ansible.builtin.set_fact:
         ansible_python_interpreter: /usr/bin/python3
@@ -43,16 +43,28 @@
         state: absent
       when: ansible_facts['os_family'] == "RedHat"
 
-    # Comprobar si se necesita reiniciar (para Rocky Linux)
-    - name: Check if reboot is required (Rocky Linux)
-      command: needs-restarting -r
-      register: reboot_needed
-      failed_when: reboot_needed.rc not in [0, 1]
-      changed_when: reboot_needed.rc == 1
+    # Obtener la versión del kernel en ejecución
+    - name: Check running kernel version
+      ansible.builtin.command: uname -r
+      register: current_kernel
       when: ansible_facts['os_family'] == "RedHat"
 
-    - name: Reboot the server if required (Rocky Linux)
+    # Obtener la última versión del kernel instalado
+    - name: Check latest installed kernel version
+      ansible.builtin.command: rpm -q --last kernel | head -n 1 | awk '{print $1}' | sed 's/kernel-//'
+      register: latest_installed_kernel
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Debug kernel versions
+      ansible.builtin.debug:
+        msg: "Running kernel: {{ current_kernel.stdout }}, Latest installed kernel: {{ latest_installed_kernel.stdout }}"
+      when: ansible_facts['os_family'] == "RedHat"
+
+    # Reiniciar solo si el kernel activo y el último kernel instalado no coinciden
+    - name: Reboot the server if a new kernel is installed
       ansible.builtin.reboot:
-        msg: "Rebooting to apply updates"
+        msg: "Rebooting to apply new kernel"
         reboot_timeout: 300
-      when: reboot_needed is defined and reboot_needed.rc == 1 and ansible_facts['os_family'] == "RedHat"
+      when: 
+        - ansible_facts['os_family'] == "RedHat"
+        - current_kernel.stdout != latest_installed_kernel.stdout
