@@ -1,5 +1,5 @@
 ---
-- name: Configure PostgreSQL and install Zabbix on Rocky Linux
+- name: Configure PostgreSQL 14 and install Zabbix on Rocky Linux
   hosts: Zabbix
   become: true
 
@@ -12,19 +12,20 @@
     postgres_admin_password: "asd.1234"
 
   tasks:
-  - name: Install PostgreSQL packages
+  - name: Install PostgreSQL 14 and required packages
     dnf:
-      name: postgresql-server
-      state: present
+      name: 
+        - https://download.postgresql.org/pub/repos/yum/14/redhat/rhel-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+        - postgresql14-server
     tags: install
 
-  - name: Initialize PostgreSQL database
-    command: /usr/bin/postgresql-setup --initdb
+  - name: Initialize PostgreSQL 14 database
+    command: /usr/pgsql-14/bin/postgresql-14-setup initdb
     args:
-      creates: /var/lib/pgsql/data/PG_VERSION
+      creates: /var/lib/pgsql/14/data/PG_VERSION
     tags: init_db
 
-  - name: Start and enable PostgreSQL service
+  - name: Start and enable PostgreSQL 14 service
     service:
       name: postgresql-14
       state: started
@@ -94,7 +95,7 @@
     command: >
       psql -U {{ zabbix_db_user }} -d {{ zabbix_db_name }} -f /usr/share/zabbix-server-pgsql/schema.sql
     args:
-      creates: /var/lib/pgsql/data/zabbix_schema_imported
+      creates: /var/lib/pgsql/14/data/zabbix_schema_imported
     tags: zabbix
 
   - name: Import Zabbix images data
@@ -102,7 +103,7 @@
     command: >
       psql -U {{ zabbix_db_user }} -d {{ zabbix_db_name }} -f /usr/share/zabbix-server-pgsql/images.sql
     args:
-      creates: /var/lib/pgsql/data/zabbix_images_imported
+      creates: /var/lib/pgsql/14/data/zabbix_images_imported
     tags: zabbix
 
   - name: Import Zabbix data data
@@ -110,7 +111,7 @@
     command: >
       psql -U {{ zabbix_db_user }} -d {{ zabbix_db_name }} -f /usr/share/zabbix-server-pgsql/data.sql
     args:
-      creates: /var/lib/pgsql/data/zabbix_data_imported
+      creates: /var/lib/pgsql/14/data/zabbix_data_imported
     tags: zabbix
 
   - name: Configure Zabbix server to use PostgreSQL
