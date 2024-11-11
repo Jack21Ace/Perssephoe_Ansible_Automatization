@@ -16,7 +16,7 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Actualizar lista de paquetes en Rocky Linux (RHEL)
-      yum:
+      dnf:
         update_cache: yes
       when: ansible_facts['os_family'] == "RedHat"
 
@@ -26,7 +26,7 @@
       when: ansible_facts['os_family'] == "Debian"
 
     - name: Actualizar paquetes instalados en Rocky Linux (RHEL)
-      yum:
+      dnf:
         name: "*"
         state: latest
       when: ansible_facts['os_family'] == "RedHat"
@@ -37,10 +37,8 @@
         autoclean: yes
       when: ansible_facts['os_family'] == "Debian"
 
-    - name: Limpiar caché de paquetes en Rocky Linux (RHEL)
-      yum:
-        name: "*"
-        state: autoremove
+    - name: Eliminar paquetes no utilizados en Rocky Linux (RHEL)
+      ansible.builtin.command: dnf autoremove -y
       when: ansible_facts['os_family'] == "RedHat"
 
     # Obtener la versión del kernel en ejecución
