@@ -141,7 +141,7 @@
   - name: Configure Zabbix to use nginx-server as web server
     lineinfile:
       path: /etc/zabbix/web/zabbix.conf.php
-      regexp: '^\$DB['SERVER']'
+      regexp: "^\\$DB['SERVER']"
       line: "\$DB['SERVER'] = '10.243.0.35';"
     tags: config
 
