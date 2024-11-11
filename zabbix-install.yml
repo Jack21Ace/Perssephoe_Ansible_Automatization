@@ -142,7 +142,7 @@
     lineinfile:
       path: /etc/zabbix/web/zabbix.conf.php
       regexp: '^\$DB['SERVER']'
-      line: '\$DB['SERVER'] = '10.243.0.35';'
+      line: "\$DB['SERVER'] = '10.243.0.35';"
     tags: config
 
   - name: Ensure nginx-server is reachable from Zabbix
