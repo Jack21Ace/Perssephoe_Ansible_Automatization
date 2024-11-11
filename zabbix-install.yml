@@ -138,24 +138,24 @@
       - zabbix-agent
     tags: service
 
-  - name: Configure Zabbix to use nginx-server as web server
+  - name: Configure Zabbix to use PostgreSQL as the database in zabbix.conf.php
     blockinfile:
       path: /etc/zabbix/web/zabbix.conf.php
       marker: "# {mark} ANSIBLE MANAGED BLOCK ZABBIX CONFIG"
       block: |
         <?php
-        $DB['TYPE']     = 'MYSQL';
+        $DB['TYPE']     = 'POSTGRESQL';
         $DB['SERVER']   = '10.243.0.35';
-        $DB['PORT']     = '0';
-        $DB['DATABASE'] = 'zabbix';
-        $DB['USER']     = 'zabbix';
-        $DB['PASSWORD'] = 'password';
-        $DB['SCHEMA']   = '';
+        $DB['PORT']     = '5432';
+        $DB['DATABASE'] = '{{ zabbix_db_name }}';
+        $DB['USER']     = '{{ zabbix_db_user }}';
+        $DB['PASSWORD'] = '{{ zabbix_db_password }}';
+        $DB['SCHEMA']   = 'public';
         $ZBX_SERVER     = '127.0.0.1';
         $ZBX_SERVER_PORT= '10051';
         $ZBX_SERVER_NAME= '';
         $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
-      tags: config
+    tags: config
 
   - name: Ensure nginx-server is reachable from Zabbix
     ansible.builtin.wait_for:
