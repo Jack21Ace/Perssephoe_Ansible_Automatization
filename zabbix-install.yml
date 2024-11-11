@@ -26,7 +26,7 @@
 
   - name: Start and enable PostgreSQL service
     service:
-      name: postgresql
+      name: postgresql-14
       state: started
       enabled: yes
     tags: service
