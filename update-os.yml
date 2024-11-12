@@ -4,8 +4,9 @@
   become: yes
   gather_facts: yes
   tasks:
-
-    
+    - name: Configurar el intérprete de Python
+      ansible.builtin.set_fact:
+        ansible_python_interpreter: /usr/bin/python3    
 
     - name: Actualizar lista de paquetes en Debian/Ubuntu
       apt:
